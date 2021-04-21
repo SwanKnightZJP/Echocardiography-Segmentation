@@ -3,7 +3,7 @@
 ## Task：To achieve tissue segmentation for 4D echocardiography
 
 ### Subtasks：
-01 Flow segmentation of the left ventricle
+01 Flow segmentation of the left ventricle  
 02 Shell segmentation of the left ventricle
 
 ## Data：
