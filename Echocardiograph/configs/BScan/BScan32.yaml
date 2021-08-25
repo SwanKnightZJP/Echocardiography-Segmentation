@@ -1,0 +1,55 @@
+#  shallow_net test  ( where the first channel=8 and last channel=128)
+# cfg.model_pth = /model + /(task) + /(data_type) + /(model)
+# cfg.log_pth = /data/record + /(task) + /(data_type) + /(model)
+# net for load = /lib/net + /(task) + /network_dict['network']
+# data for load = /lib/dataset --- + train.dataset & test.dataset ---> dataset_catalog.py
+#     dataloader = /lib/dataset + /(task)
+#
+# 2021 07 08 11:30   Vnet(ELU)+Dice_GDice+RandomPatches+OriImg with 2GPU BATCH_ABILITY==4
+#
+# the data is from V5, the padding image
+# and its size = 112, 112, 160
+
+
+model: 'SVnet_ELU_+GDiceBG_CE+RandomPatches_Ori_Padding'        # used to save the recoder_log
+task: 'BScanSeg'        # this will affect the first level parent directory
+
+data_type: 'Data_112_112_160_V5'
+
+network: 'Vnet8x'     # this will affect the dictionary for selecting networks
+
+model_dir: 'model/'
+record_dir: 'data/record/'
+
+resume: true
+gpus: (3, 2, 1, 0)
+num_class: 2            # BinerySegmentation
+loss: 'GDiceBG_CE'
+
+elu: True
+nll: False
+
+data:
+    img_type: 'O'        # 'E': enhance, 'O': original
+    DataTransType: 'JustToTensor'
+    Constractioner: 'RandomPatches_xy'
+    clip_size: (112, 112, 160)
+    patch_size: (112, 112, 160)  # x y z
+
+train:
+    optim: 'adam'
+    lr: 1e-4                                # has been adjusted @ 2021 07 03
+    milestones: (300, 600, 1500, 3000)      # has been adjusted @ 2021 07 03
+    gamma: 0.5
+
+    batch_size: 4             # for four cards
+    dataset: 'BScan3D_United_Train_V5'  # @ dataset_catalog
+    num_workers: 4
+    epoch: 5500
+
+test:
+    dataset: 'BScan3D_United_Val_V5'
+    batch_size: 1
+
+save_ep: 50
+eval_ep: 10
